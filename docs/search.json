@@ -4,7 +4,7 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "About this site\nJillian Andres Rothschild is a Government and Politics PhD student at the University of Maryland.\n\n1 + 1\n\n[1] 2"
   },
   {
     "objectID": "index.html",
@@ -12,5 +12,12 @@
     "title": "website",
     "section": "",
     "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "research.html",
+    "href": "research.html",
+    "title": "website",
+    "section": "",
+    "text": "---\ntitle: \"Research\"\n---"
   }
 ]
