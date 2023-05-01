@@ -4,6 +4,8 @@ title: "About"
 
 About this site
 
+Jillian Andres Rothschild is a Government and Politics PhD student at the University of Maryland.
+
 ```{r}
 1 + 1
 ```
