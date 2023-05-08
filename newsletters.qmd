@@ -85,8 +85,8 @@ dfmat_rusers <- dfm_group(dfmat_r, groups = last_name)
 ndoc(dfmat_rusers)
 dfmat_rusers <- dfmat_rusers %>% 
     dfm_select(min_nchar = 2) %>% 
-    dfm_trim(min_termfreq = 10) 
-dfmat_rusers <- dfmat_rusers[ntoken(dfmat_rusers) > 50,]
+    dfm_trim(min_termfreq = 50) # trimming dataset, only words that happen 50 times, helps make sense of data 
+dfmat_rusers <- dfmat_rusers[ntoken(dfmat_rusers) > 1000,] # only keeping users with more than 1000 tokens, helps to trim dataset and identify top users
 tstat_dist <- as.dist(textstat_dist(dfmat_rusers))
 user_clust <- hclust(tstat_dist)
 plot(user_clust)
@@ -106,8 +106,8 @@ dfmat_dusers <- dfm_group(dfmat_dems, groups = last_name)
 ndoc(dfmat_dusers)
 dfmat_dusers <- dfmat_dusers %>% 
     dfm_select(min_nchar = 2) %>% 
-    dfm_trim(min_termfreq = 10) 
-dfmat_dusers <- dfmat_dusers[ntoken(dfmat_dusers) > 50,]
+    dfm_trim(min_termfreq = 50) # trimming dataset, only words that happen 50 times, helps make sense of data  
+dfmat_dusers <- dfmat_dusers[ntoken(dfmat_dusers) > 1000,] # only keeping users with more than 1000 tokens, helps to trim dataset and identify top users
 tstat_dist <- as.dist(textstat_dist(dfmat_dusers))
 user_clust <- hclust(tstat_dist)
 plot(user_clust)
