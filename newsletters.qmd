@@ -1,0 +1,119 @@
+---
+title: "Newsletter Networks"
+format: html
+editor: visual
+root.dir: "C:/Users/15707/Documents/GVPT Methods"
+---
+
+# Project Overview
+
+For this project, I downloaded Congressional newsletters mentioning "January 6th" from 1/1/21 - 1/31/23. The newsletters are from the DC Inbox dataset (dcinbox.com). I am interested in partisan differences in these newsletters.
+
+Figure 1 represents the top words in the newsletters by party.
+
+```{r, echo=FALSE, results='asis'}
+
+## Library to produce network graphs
+library(igraph) 
+library(haven)
+library(foreign)
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+library(devtools)
+library(quanteda)
+library(quanteda.textstats)
+library(quanteda.textmodels)
+library(quanteda.textplots)
+library(tm)
+library(readtext)
+library(stringr)
+library(tidytext)
+
+#set your working directory
+setwd("C:/Users/15707/Documents/GVPT Methods")
+
+#load Data
+newsletters <- read.csv("dcinbox_export_january 6th.csv")
+republicans <- ifelse(newsletters$Party=="Republican",1,0) # making a variable for party where republicans are 1 and democrats are 0
+newsletters$republicans <- republicans
+text <- newsletters$Body 
+myCorpus <-corpus(text)
+docvars(myCorpus, "republicans") <- republicans
+last_name <- newsletters$Last.Name
+docvars(myCorpus, "last_name") <- last_name
+toks_text <- tokens(myCorpus, remove_punct = TRUE) 
+dfmat_all <- toks_text %>% 
+    dfm() %>% 
+    dfm_remove(pattern = c("$*", "#*", "@*")) %>% 
+    dfm_remove(pattern = stopwords("en")) %>% 
+    dfm_remove(pattern = stopwords("sp")) # removing symbols and stopwords in english and spanish. Some of the newsletters have sections in spanish.
+dfmat_text <- dfm_trim(dfmat_all, min_termfreq = 10) # trimming data, words used less than 10 times are excluded
+# head(tstat_freq, 32)
+temp<-dfm_group(dfmat_text, republicans)
+
+dfmat_text %>% 
+  textstat_frequency(.,n = 15) %>% 
+  ggplot(aes(x = reorder(feature, frequency), y = frequency)) +
+  geom_point() +
+  coord_flip() +
+  labs(x = NULL, y = "Frequency") +
+  theme_minimal()
+docvars(dfmat_text, "republicans") <- republicans
+
+head(textstat_keyness(dfmat_text, target=republicans==0, measure="chi2"), n=30)
+compareText<-textstat_keyness(dfmat_text, target=republicans==0, measure="chi2")
+textplot_keyness(compareText,
+                 color = c("blue", "red"),
+                 labelcolor = "gray30",
+                 labelsize = 4,
+                 n = 30L) # top words by party
+
+```
+
+I was also interested in seeing the similarity among newsletter authors by party. Figure 2 represents author similarity among Republicans. Representative Liz Cheney defied her party by condemning the January 6th attacks, and perhaps not surprisingly, she is an outlier among Republicans in this dataset. Representative Gaetz and Representative Gosar have reputations for being farther right than most of their co-partisans, and we can see in Figure 2 that they are clustered together.
+
+```{r, echo=FALSE, results='asis'}
+repcor <- corpus_subset(myCorpus, republicans == 1)
+toksr <- tokens(repcor, remove_punct = TRUE) 
+dfmat_r <- toksr %>% 
+    dfm() %>% 
+    dfm_remove(pattern = c("$*", "#*", "@*")) %>% 
+    dfm_remove(pattern = stopwords("en")) %>% 
+    dfm_remove(pattern = stopwords("sp")) 
+dfmat_rusers <- dfm_group(dfmat_r, groups = last_name)
+ndoc(dfmat_rusers)
+dfmat_rusers <- dfmat_rusers %>% 
+    dfm_select(min_nchar = 2) %>% 
+    dfm_trim(min_termfreq = 10) 
+dfmat_rusers <- dfmat_rusers[ntoken(dfmat_rusers) > 50,]
+tstat_dist <- as.dist(textstat_dist(dfmat_rusers))
+user_clust <- hclust(tstat_dist)
+plot(user_clust)
+```
+
+Figure 3 represents author similarity among Democrats. Senator Joe Manchin often contradicts his party, and we can see he is in his own cluster.
+
+```{r, echo=FALSE, results='asis'}
+demcor <- corpus_subset(myCorpus, republicans == 0)
+toksd <- tokens(demcor, remove_punct = TRUE) 
+dfmat_dems <- toksd %>% 
+    dfm() %>% 
+    dfm_remove(pattern = c("$*", "#*", "@*")) %>% 
+    dfm_remove(pattern = stopwords("en")) %>% 
+    dfm_remove(pattern = stopwords("sp")) 
+dfmat_dusers <- dfm_group(dfmat_dems, groups = last_name)
+ndoc(dfmat_dusers)
+dfmat_dusers <- dfmat_dusers %>% 
+    dfm_select(min_nchar = 2) %>% 
+    dfm_trim(min_termfreq = 10) 
+dfmat_dusers <- dfmat_dusers[ntoken(dfmat_dusers) > 50,]
+tstat_dist <- as.dist(textstat_dist(dfmat_dusers))
+user_clust <- hclust(tstat_dist)
+plot(user_clust)
+```
+
+# R Script
+
+```{r, ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
