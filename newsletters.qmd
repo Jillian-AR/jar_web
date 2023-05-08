@@ -11,7 +11,7 @@ For this project, I downloaded Congressional newsletters mentioning "January 6th
 
 Figure 1 represents the top words in the newsletters by party.
 
-```{r, echo=FALSE, results='asis', header=FALSE}
+```{r, echo=FALSE, results='asis', header=FALSE, message=FALSE}
 
 ## Library to produce network graphs
 library(igraph) 
