@@ -11,6 +11,8 @@ website:
       - about.qmd
       - href: research.qmd
         text: Research
+      - href: newsletters.qmd
+      - text: Newsletters Project
 
 format:
   html:
